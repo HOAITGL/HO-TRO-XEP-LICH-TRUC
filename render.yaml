@@ -1,9 +1,10 @@
 services:
   - type: web
-    name: lich-truc
+    name: ho-tro-xep-lich-truc
     env: python
+    plan: free
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "python app.py"
+    startCommand: "gunicorn app:app"
     envVars:
       - key: FLASK_ENV
         value: production
