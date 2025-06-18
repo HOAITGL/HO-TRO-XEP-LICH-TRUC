@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+{% block title %}Thống kê{% endblock %}
+{% block content %}
+<h2>📊 Thống kê tổng hợp</h2>
+<ul>
+    <li>Tổng nhân sự: {{ total_users }}</li>
+    <li>Tổng ca trực: {{ total_shifts }}</li>
+    <li>Số lượt xếp lịch: {{ total_schedules }}</li>
+</ul>
+<h3>📈 Lịch theo nhân viên</h3>
+<ul>
+    {% for name, count in schedules_per_user %}
+        <li>{{ name }}: {{ count }} lượt</li>
+    {% endfor %}
+</ul>
+{% endblock %}
+

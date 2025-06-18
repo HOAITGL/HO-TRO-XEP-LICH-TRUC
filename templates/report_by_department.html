@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+{% block title %}Báo cáo theo khoa{% endblock %}
+{% block content %}
+<h2>📊 Báo cáo lịch trực theo khoa</h2>
+
+{% for dept, schedules in report.items() %}
+  <h4>{{ dept }}</h4>
+  <table class="table table-bordered table-sm">
+    <thead class="table-light">
+      <tr>
+        <th>Ngày</th>
+        <th>Ca trực</th>
+        <th>Nhân viên</th>
+        <th>Chức danh</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for s in schedules %}
+      <tr>
+        <td>{{ s.work_date.strftime('%d/%m/%Y') }}</td>
+        <td>{{ s.shift.name }}</td>
+        <td>{{ s.user.name }}</td>
+        <td>{{ s.user.position }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>Không có dữ liệu lịch trực.</p>
+{% endfor %}
+{% endblock %}

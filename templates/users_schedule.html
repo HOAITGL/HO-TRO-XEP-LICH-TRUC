@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Lịch trực của nhân viên</title>
+</head>
+<body>
+  <h2>Lịch trực của {{ user.name }}</h2>
+  <table border="1" cellpadding="5">
+    <thead>
+      <tr><th>Ngày</th><th>Ca trực</th></tr>
+    </thead>
+    <tbody>
+      {% for s in schedules %}
+        <tr><td>{{ s.work_date }}</td><td>{{ s.shift.name }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

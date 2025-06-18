@@ -1,0 +1,49 @@
+{% extends 'layout.html' %}
+{% block title %}Phân quyền người dùng{% endblock %}
+{% block content %}
+<h2>🔐 Hệ thống phân quyền</h2>
+
+<form method="POST">
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Họ tên</th>
+        <th>Tên đăng nhập</th>
+        <th>Khoa</th>
+        <th>Quyền</th>
+        <th>Vai trò chuyên môn</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+        <tr>
+          <td>{{ user.name }}</td>
+          <td>{{ user.username }}</td>
+          <td>
+            <select name="department_{{ user.id }}" class="form-select">
+              {% for d in departments %}
+                <option value="{{ d }}" {% if user.department == d %}selected{% endif %}>{{ d }}</option>
+              {% endfor %}
+            </select>
+          </td>
+          <td>
+            <select name="role_{{ user.id }}" class="form-select">
+              <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+              <option value="manager" {% if user.role == 'manager' %}selected{% endif %}>Manager</option>
+              <option value="user" {% if user.role == 'user' %}selected{% endif %}>User</option>
+            </select>
+          </td>
+          <td>
+            <select name="position_{{ user.id }}" class="form-select">
+              <option value="Bác sĩ" {% if user.position == 'Bác sĩ' %}selected{% endif %}>Bác sĩ</option>
+              <option value="Điều dưỡng" {% if user.position == 'Điều dưỡng' %}selected{% endif %}>Điều dưỡng</option>
+              <option value="Kỹ thuật viên" {% if user.position == 'Kỹ thuật viên' %}selected{% endif %}>Kỹ thuật viên</option>
+            </select>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <button type="submit" class="btn btn-primary">💾 Lưu thay đổi</button>
+</form>
+{% endblock %}

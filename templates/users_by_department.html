@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block title %}Quản lý nhân sự{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>Danh sách nhân sự theo khoa/phòng</h2>
+
+  {% if user.role == 'admin' %}
+  <form method="GET" class="mb-3">
+    <label for="department">Chọn khoa/phòng:</label>
+    <select name="department" class="form-control w-auto d-inline-block ms-2" onchange="this.form.submit()">
+      <option value="">-- Tất cả --</option>
+      {% for dept in departments %}
+        <option value="{{ dept }}" {% if dept == selected_department %}selected{% endif %}>{{ dept }}</option>
+      {% endfor %}
+    </select>
+  </form>
+  {% endif %}
+
+  {% if user.role in ['admin', 'manager'] %}
+  <a href="/users/add" class="btn btn-success mb-3">➕ Thêm nhân viên</a>
+  <a href="/import-users" class="btn btn-outline-secondary ms-2">📤 Import từ Excel</a>
+  {% endif %}
+
+  <table class="table table-bordered">
+     <thead class="table-dark">
+       <tr>
+        <th>Họ tên</th>
+        <th>Tên đăng nhập</th>
+        <th>Vai trò</th>
+        <th>Khoa/Phòng</th>
+        <th>Chức danh</th>
+        <th>Loại hợp đồng</th>
+        <th>Số điện thoại</th>
+        <th>Email</th>
+        <th>Hành động</th>
+       </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+         <td>{{ user.name }}</td>
+         <td>{{ user.username }}</td>
+         <td>{{ user.role }}</td>
+         <td>{{ user.department }}</td>
+         <td>{{ user.position }}</td>
+         <td>{{ user.contract_type or '' }}</td> <!-- ✅ hiển thị dữ liệu -->                   
+         <td>{{ user.phone or '' }}</td>
+         <td>{{ user.email or '' }}</td>
+         <td>
+             <a href="/users/edit/{{ user.id }}" class="btn btn-sm btn-primary">Sửa</a>
+             <a href="/users/delete/{{ user.id }}" class="btn btn-sm btn-danger" onclick="return confirm('Xác nhận xoá?')">Xoá</a>
+             <a href="/send-email/{{ user.id }}" class="btn btn-sm btn-secondary mt-1">📧 Gửi email</a>
+         </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

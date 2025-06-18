@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Quản lý nhân viên</title>
+</head>
+<body>
+  <h2>Danh sách nhân viên</h2>
+  <table border="1" cellpadding="5">
+    <thead>
+      <tr><th>Tên</th><th>Phòng ban</th><th>Chức vụ</th></tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+        <tr><td>{{ u.name }}</td><td>{{ u.department }}</td><td>{{ u.role }}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</body>
+</html>

@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+{% block title %}Xếp lịch trực theo khoa{% endblock %}
+{% block content %}
+
+<div class="d-flex align-items-center gap-3 mb-3">
+  <h2>📅 Xếp lịch trực theo khoa</h2>
+  <a href="{{ url_for('auto_assign_page') }}" class="btn btn-warning">⚙️ Tạo lịch tự động</a>
+</div>
+
+<form method="GET">
+  <label for="department">Chọn khoa:</label>
+  <select name="department" id="department" onchange="this.form.submit()">
+    <option value="">-- Tất cả khoa --</option>
+    {% for d in departments %}
+      <option value="{{ d }}" {% if d == selected_department %}selected{% endif %}>{{ d }}</option>
+    {% endfor %}
+  </select>
+</form>
+
+{% if users %}
+  <form method="POST">
+    <input type="hidden" name="department" value="{{ selected_department }}">
+    <label>Từ ngày: <input type="date" name="start_date" required></label>
+    <label>Đến ngày: <input type="date" name="end_date" required></label>
+
+    <style>
+      .table-container {
+        max-height: 500px;
+        overflow-y: auto;
+        border: 1px solid #dee2e6;
+      }
+      .table thead th {
+        position: sticky;
+        top: 0;
+        background-color: #f8f9fa;
+        z-index: 2;
+      }
+    </style>
+
+    <div class="table-container mt-3">
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Họ tên</th>
+            <th>Chức danh</th>
+            {% for shift in shifts %}
+              <th>{{ shift.name }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users %}
+            <tr>
+              <td>{{ user.name }}</td>
+              <td>{{ user.position }}</td>
+              {% for shift in shifts %}
+                <td><input type="checkbox" name="schedule" value="{{ user.id }}-{{ shift.id }}"></td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-2">Lưu lịch</button>
+  </form>
+{% endif %}
+{% endblock %}

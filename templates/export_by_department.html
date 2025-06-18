@@ -1,0 +1,17 @@
+{% extends 'layout.html' %}
+{% block title %}In lịch trực theo khoa{% endblock %}
+
+{% block content %}
+<h2>🖨️ In lịch trực theo khoa</h2>
+<form method="POST">
+  <div class="mb-3">
+    <label for="department" class="form-label">Chọn khoa</label>
+    <select name="department" class="form-select" required>
+      {% for dept in departments %}
+        <option value="{{ dept }}" {% if dept == selected_department %}selected{% endif %}>{{ dept }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <button type="submit" class="btn btn-primary">📥 Tải file Excel</button>
+</form>
+{% endblock %}

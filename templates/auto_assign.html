@@ -1,0 +1,57 @@
+{% extends 'layout.html' %}
+{% block title %}Tạo lịch trực tự động{% endblock %}
+
+{% block content %}
+<h2>⚙️ Tạo lịch trực tự động</h2>
+
+<form method="GET">
+  <label for="department">Chọn khoa:</label>
+  <select name="department" id="department" onchange="this.form.submit()">
+    <option value="">-- Tất cả khoa --</option>
+    {% for d in departments %}
+      <option value="{{ d }}" {% if d == selected_department %}selected{% endif %}>{{ d }}</option>
+    {% endfor %}
+  </select>
+</form>
+
+{% if users %}
+<form method="POST" action="{{ url_for('generate_schedule_route') }}">
+  <input type="hidden" name="department" value="{{ selected_department }}">
+
+  <div class="d-flex gap-3 align-items-end mb-3 mt-3">
+    <div>
+      <label class="form-label">Từ ngày:</label>
+      <input type="date" name="start_date" class="form-control form-control-sm" required>
+    </div>
+    <div>
+      <label class="form-label">Đến ngày:</label>
+      <input type="date" name="end_date" class="form-control form-control-sm" required>
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Chọn nhân viên:</label><br>
+    {% for user in users %}
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="user_ids" value="{{ user.id }}" id="user{{ user.id }}">
+        <label class="form-check-label" for="user{{ user.id }}">{{ user.name }} ({{ user.position }})</label>
+      </div>
+    {% endfor %}
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Chọn ca trực:</label><br>
+    {% for shift in shifts %}
+      {% if 'trực' in shift.name.lower() %}
+        <div class="form-check form-check-inline">
+          <input class="form-check-input" type="checkbox" name="shift_ids" value="{{ shift.id }}" id="shift{{ shift.id }}">
+          <label class="form-check-label" for="shift{{ shift.id }}">{{ shift.name }}</label>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <button type="submit" class="btn btn-primary">Tạo lịch</button>
+</form>
+{% endif %}
+{% endblock %}

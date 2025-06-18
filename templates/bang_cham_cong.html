@@ -1,0 +1,239 @@
+
+{% extends "layout.html" %}
+{% block title %}Bảng chấm công{% endblock %}
+
+{% block content %}
+<style>
+  /* Hiển thị trên trình duyệt */
+  .table .hoten {
+    min-width: 200px;
+    max-width: 250px;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .weekend-holiday {
+    background-color: #f4cccc !important;
+  }
+
+  @media print {
+    @page {
+      size: A4 landscape;
+      margin: 1cm 1cm 1cm 1.5cm;
+    }
+
+    html, body {
+      width: 100%;
+      font-size: 13px;
+      zoom: 100% !important;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: auto;
+    }
+
+    .table th, .table td {
+      padding: 2px 4px;
+      font-size: 12px;
+    }
+
+    .table .hoten {
+      min-width: 180px;
+      white-space: normal;
+      word-break: break-word;
+    }
+
+    .cot-ngay {
+      width: 2.5%;
+      text-align: center;
+    }
+
+    .d-none.d-print-block {
+      display: block !important;
+    }
+
+    .no-print {
+      display: none !important;
+    }
+
+    .weekend-holiday {
+      background-color: #d9ead3 !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+  }
+</style>
+
+<!-- TIÊU ĐỀ CHUẨN CÔNG VĂN -->
+<div class="d-none d-print-block text-center mb-3">
+  <div class="row">
+    <div class="col-6 text-start">
+      <strong>BỆNH VIỆN NHI TỈNH GIA LAI</strong><br>
+      {% if selected_department %}
+      <span style="display:inline-block; font-weight:bold; border-bottom:1px solid black; margin-left:25px;">
+        {{ selected_department.upper() }}
+      </span>
+      {% endif %}
+    </div>
+    <div class="col-6 text-center">
+      <strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong><br>
+      <div style="margin-top: 4px;">
+        <span style="display: inline-block; font-weight: normal; border-bottom: 1px solid black;">
+          Độc lập - Tự do - Hạnh phúc
+        </span>
+      </div>
+      {% if now %}
+      <div style="margin-top: 4px;">
+        <em>Gia Lai, ngày {{ now.strftime('%d') }} tháng {{ now.strftime('%m') }} năm {{ now.strftime('%Y') }}</em>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="d-print-block mb-3" style="width: 100%;">
+  <h5 class="mt-4 mb-3 fw-bold text-uppercase"
+      style="position: relative; left: 50%; transform: translateX(-50%); text-align: center;">
+    BẢNG CHẤM CÔNG THÁNG {{ month }} NĂM {{ year }}
+  </h5>
+</div>
+
+<form method="GET" class="d-flex gap-3 flex-wrap align-items-end mb-4">
+  <div>
+    <label for="department" class="form-label mb-0">Khoa/Phòng:</label>
+    <select name="department" class="form-select">
+      <option value="">-- Tất cả --</option>
+      {% for dept in departments %}
+        <option value="{{ dept }}" {% if dept == selected_department %}selected{% endif %}>{{ dept }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label for="contract_type" class="form-label mb-0">Loại hợp đồng:</label>
+    <select name="contract_type" class="form-select">
+      <option value="">-- Tất cả --</option>
+      <option value="biên chế" {% if selected_contract == 'biên chế' %}selected{% endif %}>Biên chế</option>
+      <option value="hợp đồng" {% if selected_contract == 'hợp đồng' %}selected{% endif %}>Hợp đồng</option>
+    </select>
+  </div>
+  <div>
+    <label class="form-label mb-0">Từ ngày:</label>
+    <input type="date" name="start" class="form-control" value="{{ start_date }}">
+  </div>
+  <div>
+    <label class="form-label mb-0">Đến ngày:</label>
+    <input type="date" name="end" class="form-control" value="{{ end_date }}">
+  </div>
+  <div>
+    <button type="submit" class="btn btn-primary">Xem bảng</button>
+  </div>
+  <div>
+    <a href="/export-cham-cong?start={{ start_date }}&end={{ end_date }}&department={{ selected_department }}&contract_type={{ selected_contract }}" class="btn btn-success">📥 Xuất Excel</a>
+    <button type="button" class="btn btn-secondary" onclick="window.print()">🖨 In</button>
+  </div>
+</form>
+
+<table class="table table-bordered table-sm">
+  <thead>
+    <tr>
+      <th colspan="3" style="background-color:#d9ead3; font-weight:bold;">
+        {% if print_filter and selected_contract %}
+          {{ selected_contract.upper() }}
+        {% else %}
+          BIÊN CHẾ
+        {% endif %}
+      </th>
+      <th colspan="{{ days_in_month|length }}" style="background-color:#fff2cc; font-weight:bold;">NGÀY TRONG THÁNG</th>
+      <th colspan="4" style="background-color:#d9ead3;"></th>
+    </tr>
+    <tr>
+      <th>STT</th>
+      <th class="hoten">Họ và tên</th>
+      <th>Chức danh</th>
+      {% for day in days_in_month %}
+        <th class="cot-ngay">{{ "%02d"|format(day.day) }}</th>
+      {% endfor %}
+      <th class="ketthuc">Số công<br>không hưởng lương</th>
+      <th class="ketthuc">Số công<br>hưởng lương thời gian</th>
+      <th class="ketthuc">Số công<br>nghỉ việc hưởng 100%</th>
+      <th class="ketthuc">Số công<br>BHXH</th>
+    </tr>
+    <tr>
+      <th></th><th></th><th></th>
+      {% set thu_map = ['CN','T2','T3','T4','T5','T6','T7'] %}
+      {% for day in days_in_month %}
+        <th class="cot-ngay">{{ thu_map[day.weekday()] }}</th>
+      {% endfor %}
+      <th></th><th></th><th></th><th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in users %}
+      {% if not print_filter or (selected_contract and user.contract_type == selected_contract) %}
+    <tr>
+      <td>{{ loop.index }}</td>
+      <td class="hoten">{{ user.name }}</td>
+      <td>{{ user.position }}</td>
+      {% for day in days_in_month %}
+        {% set is_weekend = day.weekday() in [5,6] %}
+        {% set is_holiday = day in holidays %}
+        <td class="cot-ngay {% if is_weekend or is_holiday %}weekend-holiday{% endif %}">
+          {% set raw = schedule_map.get((user.id, day), '') %}
+          {% if raw and raw|length > 2 and raw[-2:].isdigit() %}
+            {{ raw[:-2] }}<br>{{ raw[-2:] }}
+          {% else %}
+            {{ raw }}
+          {% endif %}
+        </td>
+      {% endfor %}
+      <td class="ketthuc">{{ summary[user.id]['kl'] }}</td>
+      <td class="ketthuc">{{ summary[user.id]['tg'] }}</td>
+      <td class="ketthuc">{{ summary[user.id]['100'] }}</td>
+      <td class="ketthuc">{{ summary[user.id]['bhxh'] }}</td>
+    </tr>
+      {% endif %}
+    {% endfor %}
+  </tbody>
+</table>
+
+<div class="d-none d-print-block" style="width: 100%; font-size: 13px; margin-top: 0.5cm;">
+  <div style="display: grid; grid-template-columns: 20% 20% 20% 20% 20%;">
+    <div style="text-align: left;">
+      <strong>Nơi nhận:</strong><br>
+      - Ban Giám đốc<br>
+      - Các khoa/phòng<br>
+      - Đăng website<br>
+      - Lưu: VP, KH-CNTT
+    </div>
+    <div style="text-align: center;">
+      <strong>NGƯỜI LẬP BẢNG</strong><br><em>(Ký, ghi rõ họ tên)</em>
+    </div>
+    <div style="text-align: center;">
+      <strong>TRƯỞNG KHOA/PHÒNG</strong><br><em>(Ký, ghi rõ họ tên)</em>
+    </div>
+    <div style="text-align: center;">
+      <strong>PHÒNG TỔ CHỨC - HCQT</strong><br><em>(Ký, ghi rõ họ tên)</em>
+    </div>
+    <div style="text-align: center;">
+      <strong>GIÁM ĐỐC</strong><br><em>(Ký, ghi rõ họ tên)</em>
+    </div>
+  </div>
+</div>
+
+<script>
+document.querySelector("form").addEventListener("submit", function(e) {
+  const printChecked = document.getElementById("print_filter").checked;
+  const contractType = document.querySelector("select[name='contract_type']").value;
+  if (printChecked && !contractType) {
+    alert("Vui lòng chọn loại hợp đồng nếu muốn lọc khi in!");
+    e.preventDefault();
+  }
+});
+</script>
+{% endblock %}

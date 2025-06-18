@@ -1,0 +1,204 @@
+
+{% extends 'layout.html' %}
+{% block title %}Lịch trực theo khoa{% endblock %}
+
+{% block content %}
+
+<!-- TIÊU ĐỀ CHUẨN CÔNG VĂN -->
+<div class="d-none d-print-block text-center mb-3">
+  <div class="row">
+    <div class="col-6 text-start">
+      <strong>BỆNH VIỆN NHI TỈNH GIA LAI</strong><br>
+      {% if selected_department %}
+      <span style="display:inline-block; font-weight:bold; border-bottom:1px solid black; margin-left:25px;">
+        {{ selected_department.upper() }}
+      </span>
+      {% endif %}
+    </div>
+    <div class="col-6 text-center">
+      <strong>CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong><br>
+      <div style="margin-top: 4px;">
+        <span style="display: inline-block; font-style: italic; border-bottom: 1px solid black;">
+          Độc lập - Tự do - Hạnh phúc
+        </span>
+      </div>
+      {% if now %}
+      <div style="margin-top: 4px;">
+        Gia Lai, ngày {{ now.strftime('%d') }} tháng {{ now.strftime('%m') }} năm {{ now.strftime('%Y') }}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<h5 class="text-center">
+  BẢNG LỊCH TRỰC {{ selected_department.upper() if selected_department else "" }}
+</h5>
+<p class="text-center">
+  Lịch trực tuần ngày {{ start_date.strftime('%d/%m/%Y') }} đến ngày {{ end_date.strftime('%d/%m/%Y') }}
+</p>
+
+<!-- Bộ lọc -->
+<form method="GET" class="mb-3 d-flex gap-3 flex-wrap align-items-end">
+  <div>
+    <label for="department" class="form-label mb-0">Khoa:</label>
+    <select name="department" id="department" class="form-select">
+      <option value="">-- Tất cả --</option>
+      {% for dept in departments %}
+        <option value="{{ dept }}" {% if dept == selected_department %}selected{% endif %}>{{ dept }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div>
+    <label for="start_date" class="form-label mb-0">Từ ngày:</label>
+    <input type="date" name="start_date" class="form-control" value="{{ start_date }}">
+  </div>
+  <div>
+    <label for="end_date" class="form-label mb-0">Đến ngày:</label>
+    <input type="date" name="end_date" class="form-control" value="{{ end_date }}">
+  </div>
+  <div>
+    <button type="submit" class="btn btn-primary">Lọc</button>
+  </div>
+</form>
+
+<!-- NÚT IN & XUẤT EXCEL -->
+<div class="d-flex gap-2 mb-3">
+  <button class="btn btn-outline-primary" onclick="window.print()">🖨 In lịch trực</button>
+  <form method="POST" action="/export-template">
+    <input type="hidden" name="department" value="{{ selected_department }}">
+    <input type="hidden" name="start_date" value="{{ start_date }}">
+    <input type="hidden" name="end_date" value="{{ end_date }}">
+    <button type="submit" class="btn btn-outline-success">📥 Xuất Excel theo mẫu</button>
+  </form>
+</div>
+
+<!-- BẢNG LỊCH TRỰC -->
+<style>
+.table-scroll {
+  max-height: 550px;
+  overflow-y: auto;
+  border: 1px solid #dee2e6;
+}
+
+.table-scroll thead th {
+  position: sticky;
+  top: 0;
+  background-color: #212529;
+  color: white;
+  z-index: 2;
+}
+</style>
+
+<div class="table-scroll">
+<table class="table table-bordered table-striped">
+  <thead class="table-dark">
+    <tr>
+      <th>Họ tên</th>
+      <th>Chức danh</th>
+      <th>Khoa</th>
+      {% for d in date_range %}
+        <th>{{ d.strftime('%d/%m') }}</th>
+      {% endfor %}
+      <th class="print-hide">Thao tác</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for u in schedule_data.values() %}
+    <tr class="user-row">
+      <td>{{ u.name }}</td>
+      <td>{{ u.position }}</td>
+      <td>{{ u.department }}</td>
+      {% for d in date_range %}
+      <td>
+        {% if u.shifts_full.get(d) %}
+          {{ u.shifts_full[d].shift_name }}
+          {% if user.role in ['admin', 'manager'] %}
+          <form method="POST" action="/schedule/delete-one"
+                onsubmit="return confirm('Xoá ca trực ngày {{ d.strftime('%d/%m') }}?')"
+                style="display:inline;">
+            <input type="hidden" name="user_id" value="{{ u.id }}">
+            <input type="hidden" name="shift_id" value="{{ u.shifts_full[d].shift_id }}">
+            <input type="hidden" name="work_date" value="{{ d.strftime('%Y-%m-%d') }}">
+            <button type="submit" class="btn btn-sm btn-danger">🗑️</button>
+          </form>
+          {% endif %}
+        {% endif %}
+      </td>
+      {% endfor %}
+      <td class="print-hide">
+        {% if user.role in ['admin', 'manager'] %}
+        <a href="/schedule/edit/{{ u.id }}" class="btn btn-primary mb-1">Sửa ca trực</a>
+        {% else %}
+        —
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+
+<!-- CHÂN TRANG IN ẤN -->
+<div class="d-none d-print-block mt-5">
+  <div class="row mt-4">
+    <div class="col-4">
+      <strong>Nơi nhận:</strong><br>
+      - Ban Giám đốc<br>
+      - Các khoa/phòng<br>
+      - Đăng website<br>
+      - Lưu: VP, KH-CNTT
+    </div>
+    <div class="col-4 text-center">
+      <strong>Người lập bảng</strong><br>
+      <em>(Ký, ghi rõ họ tên)</em>
+    </div>
+    <div class="col-4 text-center">
+      <strong>GIÁM ĐỐC</strong><br>
+      <em>(Ký, ghi rõ họ tên)</em>
+    </div>
+  </div>
+</div>
+
+<style>
+@media print {
+  .d-print-block { display: block !important; }
+  .d-print-none, .btn, .sidebar, form, nav, .print-hide, .user-greeting {
+    display: none !important;
+  }
+
+  html, body {
+    zoom: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100%;
+    height: 100%;
+  }
+
+  .container, .row, .main, .wrapper, .content {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  table {
+    width: 100% !important;
+    table-layout: fixed;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  th, td {
+    word-wrap: break-word;
+    padding: 6px;
+    border: 1px solid black;
+    text-align: center;
+  }
+}
+
+@page {
+  size: A4 landscape;
+  margin: 1cm 1cm 1cm 2cm;
+}
+</style>
+{% endblock %}

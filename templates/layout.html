@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Lịch trực{% endblock %}</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .sidebar {
+      height: 100vh;
+      width: 250px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: #343a40;
+      padding-top: 20px;
+      color: white;
+    }
+
+    .sidebar ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .sidebar ul li {
+      padding: 10px 20px;
+    }
+
+    .sidebar ul li a {
+      color: white;
+      text-decoration: none;
+      display: block;
+    }
+
+    .sidebar ul li a:hover {
+      background-color: #495057;
+      border-radius: 5px;
+    }
+
+    .content {
+      margin-left: 260px;
+      padding: 20px;
+    }
+
+    @media print {
+      nav, .sidebar, .btn, form, .d-flex, .d-print-none {
+        display: none !important;
+      }
+
+      .d-print-block {
+        display: block !important;
+      }
+
+      .hide-on-print {
+        display: none !important;
+      }
+
+      table {
+        width: 100% !important;
+        font-size: 12px;
+        border-collapse: collapse;
+      }
+
+      th, td {
+        border: 1px solid black;
+        padding: 4px;
+        text-align: center;
+      }
+
+      html, body {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        zoom: 100%;
+      }
+    }
+
+    @page {
+      size: A4 landscape;
+      margin: 1cm 1.5cm 1cm 2.05cm;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <ul>
+      <li><a href="/">🏠 Trang chủ</a></li>
+      <li><a href="/assign">📝 Xếp lịch trực</a></li>
+      <li><a href="/schedule">📅 Xem lịch trực</a></li>
+      <li><a href="/report-all">🗂 TỔNG HỢP LỊCH TRỰC</a></li>
+      <li><a href="/bang-cham-cong">📋 Bảng chấm công</a></li>
+      <li><a href="/users-by-department">👥 Nhân sự theo khoa</a></li>
+      <li><a href="/shifts">⏰ Cấu hình ca trực</a></li>
+      {% if user and user.role == 'admin' %}
+      <li><a href="/roles">🔐 Hệ thống phân quyền</a></li>
+      {% endif %}
+      <li><a href="/logout">🚪 Đăng xuất</a></li>
+    </ul>
+  </div>
+
+  <div class="content">
+    {% if user %}
+    <p class="user-greeting d-print-none">Xin chào {{ user.name }} ({{ user.role }})</p>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </div>
+
+  <script>
+    function markRowsWithoutTruc() {
+      document.querySelectorAll('.user-row').forEach(row => {
+        const cells = Array.from(row.querySelectorAll('td'));
+        const hasTruc = cells.some(cell => cell.textContent.toLowerCase().includes('trực'));
+        if (!hasTruc) {
+          row.classList.add('hide-on-print');
+        } else {
+          row.classList.remove('hide-on-print');
+        }
+      });
+    }
+
+    function prepareAndPrint() {
+      markRowsWithoutTruc();
+      setTimeout(() => window.print(), 50);
+    }
+
+    window.addEventListener('beforeprint', markRowsWithoutTruc);
+  </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2>BẢNG CHẤM CÔNG THÁNG {{ month }} NĂM {{ year }}</h2>
+<p>Khoa: {{ department }}</p>
+
+<table class="table table-bordered small">
+  <thead>
+    <tr>
+      <th rowspan="2">STT</th>
+      <th rowspan="2">Họ và tên</th>
+      <th rowspan="2">Chức vụ</th>
+      {% for d in days %}
+        <th>{{ "%02d"|format(d) }}</th>
+      {% endfor %}
+      <th rowspan="2">Tổng</th>
+    </tr>
+    <tr>
+      {% for d in days %}
+        <th>
+          {{
+            ["CN", "Thứ 2", "Thứ 3", "Thứ 4", "Thứ 5", "Thứ 6", "Thứ 7"]
+            [datetime(year, month, d).weekday()|int if datetime(year, month, d).weekday() != 6 else 0]
+          }}
+      </th>
+      {% endfor %}
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for u in users %}
+      <tr>
+        <td>{{ loop.index }}</td>
+        <td>{{ u.name }}</td>
+        <td>{{ u.position }}</td>
+        {% set total = 0 %}
+        {% for d in days %}
+          {% set sym = data[u.id][d] %}
+          <td>{{ sym }}</td>
+          {% if sym %} {% set total = total + 1 %} {% endif %}
+        {% endfor %}
+        <td>{{ total }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

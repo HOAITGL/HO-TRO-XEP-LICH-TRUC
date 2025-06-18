@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block title %}Import người dùng{% endblock %}
+{% block content %}
+<h2>📥 Import danh sách người dùng</h2>
+
+<form method="POST" enctype="multipart/form-data">
+    <label>Chọn file Excel (.xlsx):</label><br>
+    <input type="file" name="file" accept=".xlsx" required><br><br>
+    <button type="submit" class="btn btn-success">Tải lên</button>
+</form>
+
+<hr>
+<p><strong>Lưu ý:</strong> File Excel cần có cấu trúc cột sau từ hàng 2:</p>
+<ul>
+  <li>Họ tên</li>
+  <li>Tên đăng nhập</li>
+  <li>Mật khẩu</li>
+  <li>Vai trò (admin / manager / user)</li>
+  <li>Khoa phòng</li>
+  <li>Chức danh</li>
+  <li>email</li>
+  <li>Số điện thoại</li>
+</ul>
+{% endblock %}
+
+
+
+
+ 

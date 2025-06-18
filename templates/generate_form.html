@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block title %}Tạo lịch trực tự động{% endblock %}
+{% block content %}
+<h2>Tạo lịch trực tự động</h2>
+
+<form method="GET">
+  <label for="department">Khoa phòng:</label>
+  <select name="department" onchange="this.form.submit()">
+      <option value="">-- Chọn khoa --</option>
+      {% for dept in departments %}
+          <option value="{{ dept }}" {% if dept == selected_department %}selected{% endif %}>{{ dept }}</option>
+      {% endfor %}
+  </select>
+</form>
+
+{% if users %}
+<form method="POST">
+  <input type="hidden" name="department" value="{{ selected_department }}">
+
+  <label>Từ ngày: <input type="date" name="start_date" required></label><br><br>
+  <label>Đến ngày: <input type="date" name="end_date" required></label><br><br>
+
+  <strong>Chọn nhân viên:</strong><br>
+  {% for user in users %}
+    <label>
+      <input type="checkbox" name="user_ids" value="{{ user.id }}" checked>
+      {{ user.name }} ({{ user.position }})
+    </label><br>
+  {% endfor %}
+
+  <br>
+  <button type="submit" class="btn btn-success">Tạo lịch</button>
+</form>
+{% endif %}
+{% endblock %}
+

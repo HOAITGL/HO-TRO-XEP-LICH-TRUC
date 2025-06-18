@@ -1,0 +1,62 @@
+
+{% extends "layout.html" %}
+
+{% block title %}Thêm/Sửa Nhân viên{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>{{ 'Sửa' if user else 'Thêm' }} nhân viên</h2>
+  {% if error %}
+      <div class="alert alert-danger" role="alert">
+        {{ error }}
+    </div>
+  {% endif %}
+  <form method="POST">
+    <div class="mb-3">
+      <label>Họ tên:</label>
+      <input type="text" name="name" class="form-control" value="{{ user.name if user else '' }}" required>
+    </div>
+    <div class="mb-3">
+      <label>Tên đăng nhập:</label>
+      <input type="text" name="username" class="form-control" value="{{ user.username if user else '' }}" required>
+    </div>
+    <div class="mb-3">
+      <label>Mật khẩu:</label>
+      <input type="password" name="password" class="form-control" value="{{ user.password if user else '' }}" required>
+    </div>
+    <div class="mb-3">
+      <label>Vai trò:</label>
+      <select name="role" class="form-control">
+        <option value="user" {% if user and user.role == 'user' %}selected{% endif %}>User</option>
+        <option value="manager" {% if user and user.role == 'manager' %}selected{% endif %}>Manager</option>
+        <option value="admin" {% if user and user.role == 'admin' %}selected{% endif %}>Admin</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label>Khoa/Phòng:</label>
+      <input type="text" name="department" class="form-control" value="{{ user.department if user else '' }}">
+    </div>
+    <div class="mb-3">
+      <label>Chức danh:</label>
+      <input type="text" name="position" class="form-control" value="{{ user.position if user else '' }}">
+    </div>
+    <div class="mb-3">
+      <label>Loại hợp đồng:</label>
+      <select name="contract_type" class="form-control">
+        <option value="">-- Chọn loại --</option>
+        <option value="Biên chế" {% if user and user.contract_type == 'Biên chế' %}selected{% endif %}>Biên chế</option>
+        <option value="Hợp đồng" {% if user and 'hợp đồng' in user.contract_type|lower %}selected{% endif %}>Hợp đồng</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label>Số điện thoại:</label>
+      <input type="text" name="phone" class="form-control" value="{{ user.phone if user else '' }}">
+    </div>
+    <div class="mb-3">
+      <label>Email:</label>
+      <input type="email" name="email" class="form-control" value="{{ user.email if user else '' }}">
+    </div>
+    <button type="submit" class="btn btn-primary">Lưu</button>
+  </form>
+</div>
+{% endblock %}

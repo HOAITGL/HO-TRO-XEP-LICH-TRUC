@@ -1,0 +1,42 @@
+<h2>📅 Xem lịch trực</h2>
+
+<form method="GET" class="mb-3">
+  <label for="department">Lọc theo khoa:</label>
+  <select name="department" id="department" onchange="this.form.submit()">
+    <option value="">-- Tất cả khoa --</option>
+    {% for d in departments %}
+      <option value="{{ d }}" {% if d == selected_department %}selected{% endif %}>{{ d }}</option>
+    {% endfor %}
+  </select>
+</form>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Lịch trực nâng cao</title>
+  <link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css' rel='stylesheet' />
+  <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
+</head>
+<body>
+  <h2>Lịch trực (FullCalendar)</h2>
+  <div id='calendar'></div>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      var calendarEl = document.getElementById('calendar');
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridWeek',
+        locale: 'vi',
+        events: [
+          {% for s in schedules %}
+            {
+              title: '{{ s.user.name }} - {{ s.shift.name }}',
+              start: '{{ s.work_date }}T{{ s.shift.start_time }}'
+            },
+          {% endfor %}
+        ]
+      });
+      calendar.render();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+{% extends 'layout.html' %}
+{% block title %}Báo cáo theo khoa{% endblock %}
+{% block content %}
+<h2>🧾 Báo cáo lịch trực theo khoa</h2>
+{% for dpt in departments %}
+<h4>Khoa: {{ dpt }}</h4>
+<ul>
+    {% for s in schedules if s.user.department == dpt %}
+        <li>{{ s.user.name }} trực {{ s.shift.name }} ngày {{ s.work_date }}</li>
+    {% endfor %}
+</ul>
+{% endfor %}
+{% endblock %}
+

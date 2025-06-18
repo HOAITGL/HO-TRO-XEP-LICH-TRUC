@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+
+{% block title %}Sửa lịch trực{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2>🗓️ Sửa lịch trực cho {{ user.name }}</h2>
+
+  <form method="POST">
+    <table class="table table-bordered">
+      <thead class="table-dark">
+        <tr>
+          <th>Ngày</th>
+          <th>Ca trực hiện tại</th>
+          <th>Chọn ca mới</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in schedules %}
+        <tr>
+          <td>{{ s.work_date.strftime('%d/%m/%Y') }}</td>
+          <td>{{ s.shift.name }}</td>
+          <td>
+            <select name="shift_{{ s.id }}" class="form-select">
+              {% for shift in shifts %}
+              <option value="{{ shift.id }}" {% if shift.id == s.shift.id %}selected{% endif %}>{{ shift.name }}</option>
+              {% endfor %}
+            </select>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <button type="submit" class="btn btn-success">Lưu thay đổi</button>
+    <a href="/schedule" class="btn btn-secondary">Quay lại</a>
+  </form>
+</div>
+{% endblock %}
+
