@@ -43,6 +43,7 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        print(f">>> Thử đăng nhập: {username} / {password}")
         user = User.query.filter_by(username=username).first()
         if user and user.password == password:
             session['user_id'] = user.id
@@ -809,4 +810,4 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(debug=True)
-
+import seed  # tự động gọi seed.py khi khởi chạy server
