@@ -21,7 +21,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'lichtruc2025'
 db.init_app(app)
 
-@app.before_first_request
+@app.before_request
 def init_data_if_needed():
     if not User.query.first():
         print(">>> Chưa có user nào, khởi tạo dữ liệu mẫu...")
