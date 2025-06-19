@@ -815,21 +815,6 @@ def export_report_all():
     stream.seek(0)
     return send_file(stream, as_attachment=True, download_name='lich_truc_toan_vien.xlsx')
 
-@app.before_first_request
-def init_data_if_needed():
-    if not User.query.first():
-        print(">>> Chưa có user nào, khởi tạo dữ liệu mẫu...")
-        admin = User(
-            name="Quản trị viên",
-            username="admin",
-            password="admin",
-            role="admin",
-            department="Phòng CNTT",
-            position="Bác sĩ"
-        )
-        db.session.add(admin)
-        db.session.commit()
-
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
