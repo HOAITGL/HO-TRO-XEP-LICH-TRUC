@@ -21,11 +21,20 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.secret_key = 'lichtruc2025'
 db.init_app(app)
 
-@app.before_request
-def require_login():
-    allowed_routes = ['login']
-    if 'user_id' not in session and request.endpoint not in allowed_routes:
-        return redirect('/login')
+@app.before_first_request
+def init_data_if_needed():
+    if not User.query.first():
+        print(">>> Chưa có user nào, khởi tạo dữ liệu mẫu...")
+        admin = User(
+            name="Quản trị viên",
+            username="admin",
+            password="admin",
+            role="admin",
+            department="Phòng CNTT",
+            position="Bác sĩ"
+        )
+        db.session.add(admin)
+        db.session.commit()
 
 @app.context_processor
 def inject_user():
